@@ -9,6 +9,25 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
 def get_gmail_service():
     """Authenticates the user and returns the Gmail API service instance."""
+    import json
+    # Bridge env vars to token.json if they exist, to prevent popping browser OAuth
+    client_id = os.getenv("GMAIL_CLIENT_ID")
+    client_secret = os.getenv("GMAIL_CLIENT_SECRET")
+    refresh_token = os.getenv("GMAIL_REFRESH_TOKEN")
+    
+    if client_id and client_secret and refresh_token:
+        token_data = {
+            "token": "",
+            "refresh_token": refresh_token,
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "scopes": SCOPES,
+            "universe_domain": "googleapis.com"
+        }
+        with open("token.json", "w") as token_file:
+            json.dump(token_data, token_file)
+
     creds = None
     # Token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first time.
@@ -63,7 +82,7 @@ def fetch_raw_receipts(query: str, max_results: int = 25) -> list[dict]:
         max_results: Max number of messages to fetch.
         
     Returns:
-        List of dicts: {"id": str, "subject": str, "date": str, "html": str}
+        List of dicts: {"id": str, "subject": str, "date": str, "html": str, "from_header": str}
     """
     service = get_gmail_service()
     
@@ -80,6 +99,7 @@ def fetch_raw_receipts(query: str, max_results: int = 25) -> list[dict]:
         headers = msg.get("payload", {}).get("headers", [])
         subject = next((h["value"] for h in headers if h["name"].lower() == "subject"), "No Subject")
         date_header = next((h["value"] for h in headers if h["name"].lower() == "date"), "")
+        from_header = next((h["value"] for h in headers if h["name"].lower() == "from"), "")
         
         payload = msg.get("payload", {})
         html_content = extract_html_part(payload)
@@ -97,6 +117,7 @@ def fetch_raw_receipts(query: str, max_results: int = 25) -> list[dict]:
             "id": msg_id,
             "subject": subject,
             "date": date_header,
+            "from_header": from_header,
             "html": html_content
         })
         

@@ -69,10 +69,55 @@ def parse_receipt(raw: dict) -> dict:
         if all_amounts:
             total = max(all_amounts)
 
-    # 3. Determine merchant
+    # 3. Determine merchant from From header domain (most reliable)
+    # Falls back to scanning the subject for common brand keywords.
     subject = raw.get("subject", "")
-    merchant = "Apple" if "apple" in subject.lower() else "Unknown"
-    
+    merchant = None
+    from_header = raw.get("from_header", "")
+    if from_header:
+        # Extract the email address from "Display Name <addr@domain.com>" or bare "addr@domain.com"
+        addr_match = re.search(r"[\w.+-]+@([\w.-]+)", from_header)
+        if addr_match:
+            domain = addr_match.group(1).lower()
+            # Map well-known sending domains to friendly brand names
+            _DOMAIN_MAP = {
+                "apple.com": "Apple",
+                "email.apple.com": "Apple",
+                "amazon.com": "Amazon",
+                "amazon.co.uk": "Amazon",
+                "google.com": "Google",
+                "netflix.com": "Netflix",
+                "uber.com": "Uber",
+                "ubereats.com": "Uber Eats",
+                "doordash.com": "DoorDash",
+                "paypal.com": "PayPal",
+                "stripe.com": "Stripe",
+                "shopify.com": "Shopify",
+            }
+            # Exact match first, then suffix match
+            merchant = _DOMAIN_MAP.get(domain)
+            if not merchant:
+                for key, brand in _DOMAIN_MAP.items():
+                    if domain.endswith("." + key) or domain == key:
+                        merchant = brand
+                        break
+            if not merchant:
+                # Capitalize the second-level domain as the merchant name
+                parts = domain.rstrip(".").split(".")
+                merchant = parts[-2].capitalize() if len(parts) >= 2 else parts[0].capitalize()
+
+    if not merchant:
+        # Fallback: scan subject for known brand keywords
+        subject_lower = subject.lower()
+        if "apple" in subject_lower:
+            merchant = "Apple"
+        elif "amazon" in subject_lower:
+            merchant = "Amazon"
+        elif "google" in subject_lower:
+            merchant = "Google"
+        else:
+            merchant = "Unknown"
+
     return {
         "id": raw.get("id"),
         "date": parsed_date,

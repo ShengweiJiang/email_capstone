@@ -1,0 +1,41 @@
+[parent] sys.executable = C:\Users\galax\AppData\Local\Programs\Python\Python312\python.exe
+[parent] sys.prefix     = C:\Users\galax\AppData\Local\Programs\Python\Python312
+[parent] cwd            = E:\email_capstone
+[parent] PYTHONPATH     = 'E:\\email_capstone\\.venv\\Lib\\site-packages'
+[parent] VIRTUAL_ENV    = 'E:\\email_capstone\\.venv'
+[parent] find_spec('google.auth') -> E:\email_capstone\.venv\Lib\site-packages\google\auth\__init__.py
+[parent] find_spec('mcp') -> E:\email_capstone\.venv\Lib\site-packages\mcp\__init__.py
+[parent] find_spec('google.adk') -> E:\email_capstone\.venv\Lib\site-packages\google\adk\__init__.py
+[parent] --- child stderr below ---
+INFO:mcp.server.lowlevel.server:Processing request of type ListToolsRequest
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "E:\email_capstone\receipt_agent\gmail_mcp_server.py", line 57, in <module>
+    mcp.run(transport="stdio")
+  File "E:\email_capstone\.venv\Lib\site-packages\mcp\server\fastmcp\server.py", line 296, in run
+    anyio.run(self.run_stdio_async)
+  File "E:\email_capstone\.venv\Lib\site-packages\anyio\_core\_eventloop.py", line 83, in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\email_capstone\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2436, in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\galax\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\galax\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "E:\email_capstone\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2419, in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\email_capstone\.venv\Lib\site-packages\mcp\server\fastmcp\server.py", line 755, in run_stdio_async
+    async with stdio_server() as (read_stream, write_stream):
+  File "C:\Users\galax\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\email_capstone\.venv\Lib\site-packages\mcp\server\stdio.py", line 47, in stdio_server
+    stdin = anyio.wrap_file(TextIOWrapper(sys.stdin.buffer, encoding="utf-8", errors="replace"))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: I/O operation on closed file
