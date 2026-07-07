@@ -626,7 +626,7 @@ else:
     st.caption(f"📬 Gmail query: `{query}`")
 
     if st.session_state.step2_state == "idle":
-        st.markdown('<p class="card-description">Trigger the multi-agent AI pipeline. The system will use the MCP server to confirm access, then fetch and parse receipts via Python and synthesize a spending report.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="card-description">Trigger the multi-agent AI pipeline. The system will use the MCP server to confirm access, then fetch and parse receipts via the Gmail MCP server and synthesize a spending report.</p>', unsafe_allow_html=True)
         if st.button("Analyze Spending", key="btn_analyze_spending"):
             st.session_state.step2_state = "running"
             st.session_state.step2_start_time = time.time()

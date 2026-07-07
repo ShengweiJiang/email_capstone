@@ -52,6 +52,3 @@ def get_spending_receipts(query: str, max_results: int = 25) -> dict:
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
-
-if __name__ == "__main__":
-    mcp.run(transport="stdio")
